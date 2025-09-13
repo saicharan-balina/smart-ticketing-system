@@ -4,7 +4,7 @@
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
 ![Framework](https://img.shields.io/badge/Framework-FastAPI-blueviolet)
 
-A smart, API-driven solution for assigning support tickets. It prioritizes critical issues, matches tickets to the right agent skills, and ensures a balanced workload across the team.
+A smart, API-driven solution for assigning support tickets. This project intelligently prioritizes critical issues, matches tickets to the right agent skills, and ensures a balanced workload across the team. Our solution is designed as a robust, stateful, and scalable microservice.
 
 ---
 
@@ -14,7 +14,7 @@ Our system processes tickets in a logical, multi-step flow to find the best agen
 
 **Ticket Processing Flow:**
 
-`Start` -> `Load Agent Workloads from File` -> `Score Ticket Urgency` -> `Sort Tickets (Urgent First)` -> `Assign Tickets One-by-One` -> `Update Agent Workloads in Real-Time` -> `Save Final Workloads to File` -> `End`
+`Start` -> `Load Agent Workloads from File` -> `Prioritize All Tickets (Urgent First)` -> `Assign Tickets One-by-One` -> `Update Agent Workloads in Real-Time` -> `Save Final Workloads to File` -> `End`
 
 **Finding the Best Agent (for each ticket):**
 
@@ -22,13 +22,32 @@ Our system processes tickets in a logical, multi-step flow to find the best agen
 
 The agent with the highest score gets the ticket.
 
-## 🚀 How the System Handles a Request
+---
 
-The entire solution is wrapped in a web API, making it a scalable microservice.
+## ✨ Key Features
 
-**API Request Flow:**
+### 🔥 Intelligent Prioritization Engine
+Before any assignments are made, our system first ranks every ticket to ensure the most critical issues are addressed first. This is not a simple keyword search; it's a weighted scoring system.
 
-`Test Script (or UI)` -> `POST Request with Ticket Data` -> `FastAPI Server` -> `Assignment Logic Runs` -> `Returns Assignments as JSON` -> `Test Script Shows Results`
+**How it works:**
+1.  **Weighted Keywords:** We use a predefined dictionary of urgency keywords, each with a numerical weight (e.g., `critical: 5`, `outage: 5`, `request: 1`).
+2.  **Priority Scoring:** Each ticket's title and description are scanned. A total `priority_score` is calculated by summing the weights of any keywords found.
+3.  **Timestamp Tie-Breaker:** To ensure fairness, older tickets are given a slight priority boost if their urgency scores are identical.
+4.  **Final Sorting:** The entire list of tickets is then sorted based on this score, placing the most critical and oldest issues at the very top of the assignment queue.
+
+This means a ticket containing **"server outage"** will always be processed before a ticket for a **"software request"**, regardless of when they were submitted.
+
+### 🧠 Smart Multi-Factor Scoring
+We calculate a holistic "suitability score" for every agent-ticket pair. The agent with the highest score is chosen. This score is a blend of:
+*   **Skill Match:** How well the ticket's content matches an agent's skills.
+*   **Load Balancing:** Agents with less work are strongly preferred.
+*   **Experience:** Used as a tie-breaker between otherwise equal agents.
+
+### 💾 Stateful & Persistent Workloads
+The system has memory. It reads and writes agent workloads to a local `agent_state.json` file. This ensures that the load balancing is fair and effective across multiple batches of tickets over time.
+
+### ⚡ Fast & Modern API
+Built with **FastAPI**, our solution is a high-performance web service. It comes with automatic, interactive API documentation for easy testing and professional demos.
 
 ---
 
