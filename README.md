@@ -4,67 +4,87 @@
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
 ![Framework](https://img.shields.io/badge/Framework-FastAPI-blueviolet)
 
-An API-driven solution to intelligently assign support tickets by prioritizing critical issues, matching agent skills, and dynamically balancing workloads. This project is built to be a robust, stateful, and scalable microservice.
+A smart, API-driven solution for assigning support tickets. It prioritizes critical issues, matches tickets to the right agent skills, and ensures a balanced workload across the team.
 
 ---
 
-## 🏛️ System Architecture
+## ⚙️ How It Works: The Assignment Logic
 
-Our solution is designed as a clean, stateless API service that relies on a simple file-based persistence layer to maintain agent state between requests. This makes the service scalable and easy to deploy.
+Our system processes tickets in a logical, multi-step flow to find the best agent for each job.
 
-```mermaid
-graph LR
-    subgraph "User / Client"
-        A[Test Script / UI]
-    end
+**Ticket Processing Flow:**
 
-    subgraph "Ticket Assignment Service"
-        B[FastAPI Server]
-        C{Assignment Logic}
-    end
+`Start` -> `Load Agent Workloads from File` -> `Score Ticket Urgency` -> `Sort Tickets (Urgent First)` -> `Assign Tickets One-by-One` -> `Update Agent Workloads in Real-Time` -> `Save Final Workloads to File` -> `End`
 
-    subgraph "Persistence"
-        D[(agent_state.json)]
-    end
+**Finding the Best Agent (for each ticket):**
 
-    A -- POST /v1/ticket-assignment with dataset.json --> B
-    B -- triggers --> C
-    C -- 1. Reads last known loads --> D
-    C -- 2. Calculates optimal assignments --> C
-    C -- 3. Saves new loads --> D
-    B -- returns assignments (JSON) --> A
+`Score Agent's Skills` + `Score Agent's Current Load` + `Score Agent's Experience` -> **`Final Suitability Score`**
 
-## ✨ Key Features & Technical Highlights
+The agent with the highest score gets the ticket.
 
-Our implementation stands out by focusing on a realistic and robust system design:
+## 🚀 How the System Handles a Request
 
-**1. Multi-Factor Scoring Algorithm:** We don't just match keywords. Each assignment is a calculated decision based on a weighted score that considers:
-    *   **🎯 Skill Match Score:** A comprehensive mapping of keywords within the ticket's title and description to the agent's specific skills and their proficiency level.
-    *   **⚖️ Dynamic Load Balancing:** The system heavily favors agents with a lower current workload. The agent's load is updated *in-memory* after each assignment, ensuring fair distribution across the entire batch.
-    *   **🔥 Urgency-Based Prioritization:** Before assignment, tickets are pre-sorted based on urgency keywords (e.g., "outage," "critical," "down"). This ensures that business-critical issues are always handled first.
-    *   ** Tie-Breaker:** An agent's experience level is used as a final tie-breaker for otherwise equal scores.
+The entire solution is wrapped in a web API, making it a scalable microservice.
 
-**2. Stateful & Persistent Service:** Unlike a simple script, our service maintains the state of agent workloads between API calls.
-    *   We use a lightweight file-based persistence (`agent_state.json`) to store the latest workload of each agent after a batch of assignments is processed.
-    *   This simulates a real-world scenario where agent availability is continuous, making our load balancing far more effective over time.
+**API Request Flow:**
 
-**3. Scalable API-First Design:**
-    *   The entire logic is wrapped in a high-performance **FastAPI** web server.
-    *   This API-first approach means our assignment logic can be easily called by other services, a front-end UI, or an event-driven system (e.g., when a new ticket is created).
-    *   FastAPI also provides **auto-generating, interactive documentation** (`/docs`), making our service incredibly easy to test and demonstrate.
+`Test Script (or UI)` -> `POST Request with Ticket Data` -> `FastAPI Server` -> `Assignment Logic Runs` -> `Returns Assignments as JSON` -> `Test Script Shows Results`
 
-## 🛠️ Tech Stack
+---
 
-*   **Language:** Python 3
-*   **API Framework:** FastAPI
-*   **Data Handling:** Pandas
-*   **Server:** Uvicorn
+## ✨ Key Features
 
-## 🚀 How to Run the Project
+*   **🧠 Smart Scoring:** We don't just match keywords. Our algorithm calculates a weighted score based on:
+    *   **Skill Match:** How well the ticket's content matches an agent's skills.
+    *   **Load Balancing:** Agents with less work are strongly preferred.
+    *   **Urgency:** Critical issues are always handled first.
 
-Follow these steps to get the service running locally.
+*   **💾 Stateful Workloads:** The system remembers agent workloads between API calls by saving them to a local `agent_state.json` file. This ensures the load balancing is fair and effective over time.
 
-**1. Clone the Repository:**
+*   **⚡ Fast & Modern API:** Built with **FastAPI**, our solution is a high-performance web service. It comes with automatic, interactive API documentation for easy testing and demos.
+
+---
+
+## 🛠️ How to Run and Test
+
+Get the project running in just a few steps.
+
+### 1. Setup
+First, clone the repository and install the necessary packages.
 ```bash
+# Clone the repo
 git clone [your-repo-url]
 cd [your-repo-folder]
+
+# Create a virtual environment (optional but recommended)
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+uvicorn main:app --reload```
+The server will be live at `http://127.0.0.1:8000`.
+
+### 3. Test the Service
+
+**Option A: Interactive API Docs (Best for a Demo)**
+1.  Open your browser to **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**.
+2.  Expand the `POST /v1/ticket-assignment` endpoint.
+3.  Click "**Try it out**", paste your `dataset.json` content into the request body, and click "**Execute**".
+
+**Option B: Test Script**
+1.  Keep the server running.
+2.  Open a **new terminal** and run:
+    ```bash
+    python test_api.py
+    ```
+The script will call the API and print a summary of the results.
+
+---
+
+## 🔮 Future Improvements
+
+*   **Smarter Analysis:** Use an AI model to understand ticket text more deeply.
+*   **Database Integration:** Switch from a JSON file to a SQLite database for better data management.
+*   **Real-time Processing:** Use WebSockets to handle tickets as soon as they are created.
