@@ -1,0 +1,54 @@
+{
+  "agents": [
+    {
+      "agent_id": "agent_001",
+      "name": "Sarah Chen",
+      "current_load": 14
+    },
+    {
+      "agent_id": "agent_002",
+      "name": "Alex Rodriguez",
+      "current_load": 12
+    },
+    {
+      "agent_id": "agent_003",
+      "name": "Michael Lee",
+      "current_load": 16
+    },
+    {
+      "agent_id": "agent_004",
+      "name": "Jessica Williams",
+      "current_load": 9
+    },
+    {
+      "agent_id": "agent_005",
+      "name": "David Gupta",
+      "current_load": 4
+    },
+    {
+      "agent_id": "agent_006",
+      "name": "Emily Johnson",
+      "current_load": 26
+    },
+    {
+      "agent_id": "agent_007",
+      "name": "Chris Davis",
+      "current_load": 9
+    },
+    {
+      "agent_id": "agent_008",
+      "name": "Laura Martinez",
+      "current_load": 27
+    },
+    {
+      "agent_id": "agent_009",
+      "name": "James Brown",
+      "current_load": 3
+    },
+    {
+      "agent_id": "agent_010",
+      "name": "Michelle Kim",
+      "current_load": 5
+    }
+  ]
+}

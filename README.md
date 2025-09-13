@@ -1,13 +1,38 @@
-README.md
 # Intelligent Support Ticket Assignment System - PyCon25 Hackathon
 
-Welcome to the Intelligent Support Ticket Assignment System, a robust and scalable solution built for the PyCon25 Hackathon. This project provides an API-driven service to optimally route support tickets to the best-suited agents, balancing workload and prioritizing critical issues.
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
+![Python](https://img.shields.io/badge/Python-3.9+-blue)
+![Framework](https://img.shields.io/badge/Framework-FastAPI-blueviolet)
 
-## 📋 Project Overview
+An API-driven solution to intelligently assign support tickets by prioritizing critical issues, matching agent skills, and dynamically balancing workloads. This project is built to be a robust, stateful, and scalable microservice.
 
-This system addresses the challenge of efficiently assigning support tickets in a helpdesk environment. It processes a list of agents (with their skills and current workload) and a queue of tickets, then generates an optimal assignment plan.
+---
 
-Our solution is built as a scalable web service that can be easily integrated into a larger helpdesk ecosystem.
+## 🏛️ System Architecture
+
+Our solution is designed as a clean, stateless API service that relies on a simple file-based persistence layer to maintain agent state between requests. This makes the service scalable and easy to deploy.
+
+```mermaid
+graph LR
+    subgraph "User / Client"
+        A[Test Script / UI]
+    end
+
+    subgraph "Ticket Assignment Service"
+        B[FastAPI Server]
+        C{Assignment Logic}
+    end
+
+    subgraph "Persistence"
+        D[(agent_state.json)]
+    end
+
+    A -- POST /v1/ticket-assignment with dataset.json --> B
+    B -- triggers --> C
+    C -- 1. Reads last known loads --> D
+    C -- 2. Calculates optimal assignments --> C
+    C -- 3. Saves new loads --> D
+    B -- returns assignments (JSON) --> A
 
 ## ✨ Key Features & Technical Highlights
 
